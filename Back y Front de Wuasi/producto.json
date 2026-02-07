@@ -1,0 +1,22 @@
+{
+  "codigo": "WBS-100-0001",
+  "nombre": "Cinta Transparente 48mm x 50m",
+  "categoria": "Cintas Transparentes",
+  "descripcion": "Descripción del producto",
+  "marca": "3M",
+  "unidad_medida": "Rollos",
+  "precio_compra": 2.50,
+  "precio_venta": 4.99,
+  "stock": 150,
+  "stock_minimo": 20,
+  "proveedor": "Distribuidora Central SA",
+  "contacto_proveedor": "Juan Pérez - 555-1234",
+  "ancho": "48mm",
+  "largo": "50m",
+  "color": "Transparente",
+  "material": "Polipropileno",
+  "ubicacion": "A-01-02",
+  "fecha_registro": "2024-03-15 10:30:00",
+  "estado": "Activo",
+  "fecha_modificacion": "2024-03-15 14:20:00"
+}

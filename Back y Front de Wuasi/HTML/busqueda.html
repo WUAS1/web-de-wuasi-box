@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda Avanzada - Wuasi Box</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .search-hero {
+            background: linear-gradient(135deg, #1a5f7a, #2a9d8f);
+            color: white;
+            padding: 40px 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .search-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .search-type-tabs .nav-link {
+            border: none;
+            color: #495057;
+            font-weight: 500;
+            padding: 12px 25px;
+            border-radius: 8px;
+            margin-right: 5px;
+        }
+        
+        .search-type-tabs .nav-link.active {
+            background: linear-gradient(to right, #1a5f7a, #2a9d8f);
+            color: white;
+        }
+        
+        .search-type-tabs .nav-link:hover:not(.active) {
+            background: rgba(26, 95, 122, 0.05);
+            color: #1a5f7a;
+        }
+        
+        .search-results {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .result-item:hover {
+            background: rgba(26, 95, 122, 0.05);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-code {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #1a5f7a;
+            background: rgba(26, 95, 122, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .filter-tag {
+            background: #e9ecef;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .filter-tag .remove-tag {
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .filter-tag .remove-tag:hover {
+            color: #e63946;
+        }
+        
+        .quick-search-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-search-btn {
+            padding: 8px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            background: white;
+            color: #495057;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .quick-search-btn:hover {
+            background: linear-gradient(to right, #1a5f7a, #2a9d8f);
+            color: white;
+            border-color: #1a5f7a;
+        }
+        
+        .search-suggestions {
+            position: absolute;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .suggestion-item:hover {
+            background: rgba(26, 95, 122, 0.05);
+        }
+        
+        .advanced-filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #1a5f7a;
+        }
+        
+        .price-range-slider {
+            padding: 0 10px;
+        }
+        
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 768px) {
+            .search-hero {
+                padding: 25px 0;
+            }
+            
+            .search-type-tabs .nav-link {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .quick-search-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado Corporativo -->
+    <header class="corporate-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="logo-container">
+                        <div class="logo-icon" style="background: white; color: #e74c3c;">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>
+                            <h1 class="company-name mb-1">WUASI BOX</h1>
+                            <p class="company-tagline mb-0">Búsqueda Avanzada</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="text-white">
+                        <p class="mb-1"><i class="fas fa-calendar-alt me-2"></i>Fecha: <span id="current-date"></span></p>
+                        <p class="mb-0"><i class="fas fa-user me-2"></i>Usuario: <strong>Búsqueda</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación Principal -->
+    <nav class="navbar navbar-expand-lg navbar-light main-nav">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="index.html">
+                            <i class="fas fa-home me-1"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="registro.html">
+                            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="listado.html">
+                            <i class="fas fa-list me-1"></i> Listado
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom active" href="busqueda.html">
+                            <i class="fas fa-search me-1"></i> Búsqueda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="reportes.html">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-boxpro btn-boxpro-primary" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left me-1"></i> Volver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container">
+        <!-- Hero de Búsqueda -->
+        <div class="search-hero">
+            <div class="container">
+                <h2 class="mb-3"><i class="fas fa-search me-3"></i>Búsqueda Avanzada de Productos</h2>
+                <p class="mb-0">Encuentre productos rápidamente utilizando múltiples criterios de búsqueda</p>
+            </div>
+        </div>
+
+        <div class="main-container fade-in">
+            <!-- Pestañas de Tipo de Búsqueda -->
+            <ul class="nav nav-tabs search-type-tabs mb-4" id="searchTypeTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" 
+                            data-bs-target="#basic-search">
+                        <i class="fas fa-search me-2"></i>Búsqueda Básica
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" 
+                            data-bs-target="#advanced-search">
+                        <i class="fas fa-filter me-2"></i>Búsqueda Avanzada
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="code-tab" data-bs-toggle="tab" 
+                            data-bs-target="#code-search">
+                        <i class="fas fa-barcode me-2"></i>Por Código
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="stock-tab" data-bs-toggle="tab" 
+                            data-bs-target="#stock-search">
+                        <i class="fas fa-boxes me-2"></i>Por Stock
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="searchTabsContent">
+                <!-- Búsqueda Básica -->
+                <div class="tab-pane fade show active" id="basic-search">
+                    <div class="search-card">
+                        <h5><i class="fas fa-search me-2"></i>Búsqueda General</h5>
+                        <p class="text-muted mb-4">Busque productos por nombre, categoría, marca o descripción</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label-custom">Término de Búsqueda</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control form-control-custom" 
+                                           id="basicSearchInput"
+                                           placeholder="Ej: cinta transparente, 3M, embalaje...">
+                                </div>
+                                <div class="search-suggestions" id="searchSuggestions"></div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label-custom">Categoría</label>
+                                <select class="form-select form-control-custom" id="basicCategory">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="Cintas Transparentes">Cintas Transparentes</option>
+                                    <option value="Envoplast">Envoplast</option>
+                                    <option value="Cinta Aislante">Cinta Aislante</option>
+                                    <option value="Cinta de Oficina">Cinta de Oficina</option>
+                                    <option value="Tirro de Papel">Tirro de Papel</option>
+                                    <option value="Flejes Plásticos">Flejes Plásticos</option>
+                                    <option value="Películas Estirables">Películas Estirables</option>
+                                    <option value="Material de Protección">Material de Protección</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="quick-search-buttons">
+                                    <button class="quick-search-btn" onclick="quickSearch('stock-bajo')">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Stock Bajo
+                                    </button>
+                                    <button class="quick-search-btn" onclick="quickSearch('sin-stock')">
+                                        <i class="fas fa-times-circle me-1"></i>Sin Stock
+                                    </button>
+                                    <button class="quick-search-btn" onclick="quickSearch('nuevos')">
+                                        <i class="fas fa-star me-1"></i>Productos Nuevos
+                                    </button>
+                                    <button class="quick-search-btn" onclick="quickSearch('mejor-margen')">
+                                        <i class="fas fa-chart-line me-1"></i>Mejor Margen
+                                    </button>
+                                    <button class="quick-search-btn" onclick="quickSearch('mas-vendidos')">
+                                        <i class="fas fa-fire me-1"></i>Más Vendidos
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="filter-tags" id="basicFilters">
+                                    <!-- Los filtros activos aparecerán aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-boxpro btn-boxpro-secondary me-2" onclick="clearBasicSearch()">
+                                    <i class="fas fa-times me-2"></i>Limpiar
+                                </button>
+                                <button class="btn btn-boxpro btn-boxpro-primary" onclick="executeBasicSearch()">
+                                    <i class="fas fa-search me-2"></i>Buscar Productos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Búsqueda Avanzada -->
+                <div class="tab-pane fade" id="advanced-search">
+                    <div class="search-card">
+                        <h5><i class="fas fa-filter me-2"></i>Filtros Avanzados</h5>
+                        <p class="text-muted mb-4">Combine múltiples criterios para una búsqueda precisa</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Rango de Precios</label>
+                                <div class="price-range-slider">
+                                    <input type="range" class="form-range" min="0" max="500" step="5" 
+                                           id="priceMin" value="0">
+                                    <input type="range" class="form-range" min="0" max="500" step="5" 
+                                           id="priceMax" value="500">
+                                </div>
+                                <div class="range-values">
+                                    <span>Mín: $<span id="minPriceValue">0</span></span>
+                                    <span>Máx: $<span id="maxPriceValue">500</span></span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Rango de Stock</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="number" class="form-control form-control-custom" 
+                                               id="minStock" placeholder="Mínimo" min="0">
+                                    </div>
+                                    <div class="col">
+                                        <input type="number" class="form-control form-control-custom" 
+                                               id="maxStock" placeholder="Máximo" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Marca/Fabricante</label>
+                                <select class="form-select form-control-custom" id="advancedBrand" multiple>
+                                    <option value="3M">3M</option>
+                                    <option value="Scotch">Scotch</option>
+                                    <option value="Signode">Signode</option>
+                                    <option value="StretchPro">StretchPro</option>
+                                    <option value="WrapMaster">WrapMaster</option>
+                                    <option value="MaskingPro">MaskingPro</option>
+                                    <option value="Mobilis">Mobilis</option>
+                                </select>
+                                <small class="text-muted">Mantenga Ctrl para seleccionar múltiples</small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Proveedor</label>
+                                <select class="form-select form-control-custom" id="advancedSupplier">
+                                    <option value="">Todos los proveedores</option>
+                                    <option value="Distribuidora Central SA">Distribuidora Central SA</option>
+                                    <option value="Embalajes SA">Embalajes SA</option>
+                                    <option value="Plásticos Industriales SA">Plásticos Industriales SA</option>
+                                    <option value="Envoplast Global">Envoplast Global</option>
+                                    <option value="Electricidad Total">Electricidad Total</option>
+                                    <option value="Materiales Eléctricos">Materiales Eléctricos</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Fecha de Registro</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="date" class="form-control form-control-custom" 
+                                               id="startDate">
+                                    </div>
+                                    <div class="col">
+                                        <input type="date" class="form-control form-control-custom" 
+                                               id="endDate">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Estado del Producto</label>
+                                <select class="form-select form-control-custom" id="productStatus">
+                                    <option value="">Todos los estados</option>
+                                    <option value="active">Activo</option>
+                                    <option value="inactive">Inactivo</option>
+                                    <option value="discontinued">Descontinuado</option>
+                                    <option value="promotion">En promoción</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="excludeOutOfStock">
+                                    <label class="form-check-label" for="excludeOutOfStock">
+                                        Excluir productos sin stock
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="onlyLowStock">
+                                    <label class="form-check-label" for="onlyLowStock">
+                                        Solo productos con stock bajo
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="filter-tags" id="advancedFilters">
+                                    <!-- Los filtros avanzados activos aparecerán aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-boxpro btn-boxpro-secondary me-2" onclick="clearAdvancedSearch()">
+                                    <i class="fas fa-times me-2"></i>Limpiar Filtros
+                                </button>
+                                <button class="btn btn-boxpro btn-boxpro-primary" onclick="executeAdvancedSearch()">
+                                    <i class="fas fa-filter me-2"></i>Aplicar Filtros Avanzados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Búsqueda por Código -->
+                <div class="tab-pane fade" id="code-search">
+                    <div class="search-card">
+                        <h5><i class="fas fa-barcode me-2"></i>Búsqueda por Código</h5>
+                        <p class="text-muted mb-4">Ingrese el código exacto del producto (formato: WBS-XXX-XXXX)</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label-custom">Código del Producto</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">WBS-</span>
+                                    <input type="text" class="form-control form-control-custom" 
+                                           id="productCodeInput"
+                                           placeholder="XXX-XXXX">
+                                </div>
+                                <small class="text-muted">Ejemplo: 100-0001 para buscar WBS-100-0001</small>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label-custom">Tipo de Código</label>
+                                <select class="form-select form-control-custom" id="codeType">
+                                    <option value="exact">Coincidencia exacta</option>
+                                    <option value="partial">Coincidencia parcial</option>
+                                    <option value="range">Rango de códigos</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Formato de códigos:</strong> WBS-XXX-XXXX donde XXX es la categoría (100: Cintas Transparentes, 200: Envoplast, etc.) y XXXX es el número secuencial.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-boxpro btn-boxpro-secondary me-2" onclick="clearCodeSearch()">
+                                    <i class="fas fa-times me-2"></i>Limpiar
+                                </button>
+                                <button class="btn btn-boxpro btn-boxpro-primary" onclick="executeCodeSearch()">
+                                    <i class="fas fa-barcode me-2"></i>Buscar por Código
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Búsqueda por Stock -->
+                <div class="tab-pane fade" id="stock-search">
+                    <div class="search-card">
+                        <h5><i class="fas fa-boxes me-2"></i>Búsqueda por Nivel de Stock</h5>
+                        <p class="text-muted mb-4">Encuentre productos según su nivel de inventario</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Nivel de Stock</label>
+                                <select class="form-select form-control-custom" id="stockLevel">
+                                    <option value="">Seleccione un nivel</option>
+                                    <option value="critical">Crítico (menos del 10%)</option>
+                                    <option value="low">Bajo (menos del 25%)</option>
+                                    <option value="medium">Medio (25% - 75%)</option>
+                                    <option value="high">Alto (más del 75%)</option>
+                                    <option value="out">Agotado (0 unidades)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom">Días sin Movimiento</label>
+                                <input type="number" class="form-control form-control-custom" 
+                                       id="daysInactive"
+                                       min="0"
+                                       placeholder="Ej: 30 para productos sin movimiento en 30 días">
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="belowMinStock">
+                                    <label class="form-check-label" for="belowMinStock">
+                                        Solo productos por debajo del stock mínimo
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="needReorder">
+                                    <label class="form-check-label" for="needReorder">
+                                        Productos que necesitan reorden
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Alertas de Stock:</strong> Los productos con stock crítico aparecerán resaltados en rojo.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-boxpro btn-boxpro-secondary me-2" onclick="clearStockSearch()">
+                                    <i class="fas fa-times me-2"></i>Limpiar
+                                </button>
+                                <button class="btn btn-boxpro btn-boxpro-primary" onclick="executeStockSearch()">
+                                    <i class="fas fa-boxes me-2"></i>Buscar por Stock
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultados de Búsqueda -->
+            <div class="search-card mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Resultados de Búsqueda</h5>
+                    <div>
+                        <span class="text-muted me-3" id="resultsCount">0 productos encontrados</span>
+                        <button class="btn btn-boxpro btn-boxpro-success btn-sm" onclick="exportResults()">
+                            <i class="fas fa-file-export me-1"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="search-results" id="searchResults">
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h6 class="mb-2">No hay resultados para mostrar</h6>
+                        <p class="text-muted mb-0">Realice una búsqueda para ver los productos aquí</p>
+                    </div>
+                </div>
+                
+                <div class="mt-3" id="paginationContainer" style="display: none;">
+                    <nav aria-label="Paginación de resultados">
+                        <ul class="pagination justify-content-center" id="searchPagination">
+                            <!-- La paginación se generará dinámicamente -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de Página Corporativo -->
+    <footer class="footer-corporate">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">WUASI BOX</h5>
+                    <p class="text-white-50">
+                        Búsqueda avanzada de productos de embalaje. 
+                        Encuentre lo que necesita en segundos.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">Tipos de Búsqueda</h5>
+                    <div class="footer-links">
+                        <p><a href="#basic-search"><i class="fas fa-chevron-right me-2"></i>Búsqueda Básica</a></p>
+                        <p><a href="#advanced-search"><i class="fas fa-chevron-right me-2"></i>Búsqueda Avanzada</a></p>
+                        <p><a href="#code-search"><i class="fas fa-chevron-right me-2"></i>Por Código</a></p>
+                        <p><a href="#stock-search"><i class="fas fa-chevron-right me-2"></i>Por Stock</a></p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">Consejos de Búsqueda</h5>
+                    <p class="text-white-50">
+                        <i class="fas fa-lightbulb me-2"></i>Use * para búsquedas parciales
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-lightbulb me-2"></i>Combine filtros para resultados precisos
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-lightbulb me-2"></i>Guarde sus búsquedas frecuentes
+                    </p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p class="mb-0">© 2024 Wuasi Box. Sistema de búsqueda avanzada para productos de embalaje.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script>
+        // Datos de ejemplo para búsqueda
+        const sampleProducts = [
+            {
+                id: 1,
+                code: "WBS-100-0001",
+                name: "Cinta Transparente 48mm x 50m",
+                category: "Cintas Transparentes",
+                brand: "3M",
+                price: 4.99,
+                stock: 150,
+                minStock: 20,
+                supplier: "Distribuidora Central SA",
+                status: "active",
+                registered: "2024-01-15",
+                lastMovement: "2024-03-10"
+            },
+            {
+                id: 2,
+                code: "WBS-100-0002",
+                name: "Cinta Transparente 24mm x 25m",
+                category: "Cintas Transparentes",
+                brand: "Scotch",
+                price: 3.50,
+                stock: 89,
+                minStock: 30,
+                supplier: "Embalajes SA",
+                status: "active",
+                registered: "2024-02-10",
+                lastMovement: "2024-03-12"
+            },
+            {
+                id: 3,
+                code: "WBS-200-0001",
+                name: "Envoplast Industrial 20 micras",
+                category: "Envoplast",
+                brand: "StretchPro",
+                price: 89.99,
+                stock: 25,
+                minStock: 5,
+                supplier: "Plásticos Industriales SA",
+                status: "active",
+                registered: "2024-01-20",
+                lastMovement: "2024-03-08"
+            },
+            {
+                id: 4,
+                code: "WBS-200-0002",
+                name: "Envoplast Manual 17 micras",
+                category: "Envoplast",
+                brand: "WrapMaster",
+                price: 65.00,
+                stock: 42,
+                minStock: 10,
+                supplier: "Envoplast Global",
+                status: "active",
+                registered: "2024-02-15",
+                lastMovement: "2024-03-14"
+            },
+            {
+                id: 5,
+                code: "WBS-300-0001",
+                name: "Cinta Aislante 19mm x 20m",
+                category: "Cinta Aislante",
+                brand: "3M",
+                price: 6.50,
+                stock: 5,
+                minStock: 20,
+                supplier: "Electricidad Total",
+                status: "active",
+                registered: "2024-01-10",
+                lastMovement: "2024-03-15"
+            },
+            {
+                id: 6,
+                code: "WBS-300-0002",
+                name: "Cinta Aislante 25mm x 10m",
+                category: "Cinta Aislante",
+                brand: "Scotch",
+                price: 5.75,
+                stock: 67,
+                minStock: 25,
+                supplier: "Materiales Eléctricos",
+                status: "active",
+                registered: "2024-02-05",
+                lastMovement: "2024-03-11"
+            },
+            {
+                id: 7,
+                code: "WBS-400-0001",
+                name: "Cinta de Oficina 24mm x 40m",
+                category: "Cinta de Oficina",
+                brand: "Scotch",
+                price: 2.99,
+                stock: 120,
+                minStock: 40,
+                supplier: "Office Supplies",
+                status: "active",
+                registered: "2024-01-25",
+                lastMovement: "2024-03-13"
+            },
+            {
+                id: 8,
+                code: "WBS-500-0001",
+                name: "Tirro de Papel 24mm x 50m",
+                category: "Tirro de Papel",
+                brand: "MaskingPro",
+                price: 4.25,
+                stock: 8,
+                minStock: 15,
+                supplier: "Papeles Especiales",
+                status: "active",
+                registered: "2024-02-20",
+                lastMovement: "2024-03-09"
+            },
+            {
+                id: 9,
+                code: "WBS-600-0001",
+                name: "Fleje Plástico 16mm x 100m",
+                category: "Flejes Plásticos",
+                brand: "Signode",
+                price: 55.00,
+                stock: 34,
+                minStock: 8,
+                supplier: "Embalajes Industriales",
+                status: "active",
+                registered: "2024-01-30",
+                lastMovement: "2024-03-07"
+            },
+            {
+                id: 10,
+                code: "WBS-700-0001",
+                name: "Película Estirable 500mm",
+                category: "Películas Estirables",
+                brand: "Mobilis",
+                price: 75.00,
+                stock: 19,
+                minStock: 6,
+                supplier: "Plásticos Avanzados",
+                status: "active",
+                registered: "2024-02-25",
+                lastMovement: "2024-03-06"
+            }
+        ];
+        
+        let currentResults = [];
+        let currentPage = 1;
+        const resultsPerPage = 5;
+        
+        // Actualizar fecha actual
+        function actualizarFecha() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('es-ES', options);
+        }
+        
+        // Configurar sliders de rango de precios
+        function setupPriceSliders() {
+            const minSlider = document.getElementById('priceMin');
+            const maxSlider = document.getElementById('priceMax');
+            const minValue = document.getElementById('minPriceValue');
+            const maxValue = document.getElementById('maxPriceValue');
+            
+            function updateValues() {
+                minValue.textContent = minSlider.value;
+                maxValue.textContent = maxSlider.value;
+                updateAdvancedFilters();
+            }
+            
+            minSlider.addEventListener('input', updateValues);
+            maxSlider.addEventListener('input', updateValues);
+            
+            // Asegurar que min <= max
+            minSlider.addEventListener('input', function() {
+                if (parseInt(this.value) > parseInt(maxSlider.value)) {
+                    maxSlider.value = this.value;
+                    updateValues();
+                }
+            });
+            
+            maxSlider.addEventListener('input', function() {
+                if (parseInt(this.value) < parseInt(minSlider.value)) {
+                    minSlider.value = this.value;
+                    updateValues();
+                }
+            });
+            
+            updateValues();
+        }
+        
+        // Actualizar filtros activos
+        function updateBasicFilters() {
+            const container = document.getElementById('basicFilters');
+            const searchTerm = document.getElementById('basicSearchInput').value;
+            const category = document.getElementById('basicCategory').value;
+            
+            container.innerHTML = '';
+            
+            if (searchTerm) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Texto: "${searchTerm}"</span>
+                        <span class="remove-tag" onclick="removeFilter('search')">×</span>
+                    </div>
+                `;
+            }
+            
+            if (category) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Categoría: ${category}</span>
+                        <span class="remove-tag" onclick="removeFilter('category')">×</span>
+                    </div>
+                `;
+            }
+        }
+        
+        function updateAdvancedFilters() {
+            const container = document.getElementById('advancedFilters');
+            const minPrice = document.getElementById('minPriceValue').textContent;
+            const maxPrice = document.getElementById('maxPriceValue').textContent;
+            const minStock = document.getElementById('minStock').value;
+            const maxStock = document.getElementById('maxStock').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const status = document.getElementById('productStatus').value;
+            const excludeOutOfStock = document.getElementById('excludeOutOfStock').checked;
+            const onlyLowStock = document.getElementById('onlyLowStock').checked;
+            
+            container.innerHTML = '';
+            
+            if (minPrice > 0 || maxPrice < 500) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Precio: $${minPrice} - $${maxPrice}</span>
+                        <span class="remove-tag" onclick="removePriceFilter()">×</span>
+                    </div>
+                `;
+            }
+            
+            if (minStock || maxStock) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Stock: ${minStock || '0'} - ${maxStock || '∞'}</span>
+                        <span class="remove-tag" onclick="removeStockFilter()">×</span>
+                    </div>
+                `;
+            }
+            
+            if (startDate || endDate) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Fecha: ${startDate || 'inicio'} a ${endDate || 'hoy'}</span>
+                        <span class="remove-tag" onclick="removeDateFilter()">×</span>
+                    </div>
+                `;
+            }
+            
+            if (status) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Estado: ${status}</span>
+                        <span class="remove-tag" onclick="removeStatusFilter()">×</span>
+                    </div>
+                `;
+            }
+            
+            if (excludeOutOfStock) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Excluir sin stock</span>
+                        <span class="remove-tag" onclick="document.getElementById('excludeOutOfStock').checked = false; updateAdvancedFilters()">×</span>
+                    </div>
+                `;
+            }
+            
+            if (onlyLowStock) {
+                container.innerHTML += `
+                    <div class="filter-tag">
+                        <span>Solo stock bajo</span>
+                        <span class="remove-tag" onclick="document.getElementById('onlyLowStock').checked = false; updateAdvancedFilters()">×</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Remover filtros
+        function removeFilter(type) {
+            if (type === 'search') {
+                document.getElementById('basicSearchInput').value = '';
+            } else if (type === 'category') {
+                document.getElementById('basicCategory').value = '';
+            }
+            updateBasicFilters();
+        }
+        
+        function removePriceFilter() {
+            document.getElementById('priceMin').value = 0;
+            document.getElementById('priceMax').value = 500;
+            document.getElementById('minPriceValue').textContent = '0';
+            document.getElementById('maxPriceValue').textContent = '500';
+            updateAdvancedFilters();
+        }
+        
+        function removeStockFilter() {
+            document.getElementById('minStock').value = '';
+            document.getElementById('maxStock').value = '';
+            updateAdvancedFilters();
+        }
+        
+        function removeDateFilter() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            updateAdvancedFilters();
+        }
+        
+        function removeStatusFilter() {
+            document.getElementById('productStatus').value = '';
+            updateAdvancedFilters();
+        }
+        
+        // Búsquedas rápidas
+        function quickSearch(type) {
+            switch(type) {
+                case 'stock-bajo':
+                    document.getElementById('stockLevel').value = 'low';
+                    document.getElementById('stock-tab').click();
+                    executeStockSearch();
+                    break;
+                case 'sin-stock':
+                    document.getElementById('stockLevel').value = 'out';
+                    document.getElementById('stock-tab').click();
+                    executeStockSearch();
+                    break;
+                case 'nuevos':
+                    const today = new Date();
+                    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+                    document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
+                    document.getElementById('endDate').value = today.toISOString().split('T')[0];
+                    document.getElementById('advanced-tab').click();
+                    updateAdvancedFilters();
+                    break;
+                case 'mejor-margen':
+                    // Implementar lógica para productos con mejor margen
+                    alert('Búsqueda de productos con mejor margen implementada');
+                    break;
+                case 'mas-vendidos':
+                    // Implementar lógica para productos más vendidos
+                    alert('Búsqueda de productos más vendidos implementada');
+                    break;
+            }
+        }
+        
+        // Ejecutar búsquedas
+        function executeBasicSearch() {
+            const searchTerm = document.getElementById('basicSearchInput').value.toLowerCase();
+            const category = document.getElementById('basicCategory').value;
+            
+            let results = sampleProducts.filter(product => {
+                let matches = true;
+                
+                if (searchTerm) {
+                    matches = matches && (
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.code.toLowerCase().includes(searchTerm) ||
+                        product.brand.toLowerCase().includes(searchTerm) ||
+                        product.category.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                if (category) {
+                    matches = matches && (product.category === category);
+                }
+                
+                return matches;
+            });
+            
+            displayResults(results, 'Búsqueda básica');
+        }
+        
+        function executeAdvancedSearch() {
+            const minPrice = parseFloat(document.getElementById('minPriceValue').textContent);
+            const maxPrice = parseFloat(document.getElementById('maxPriceValue').textContent);
+            const minStock = document.getElementById('minStock').value ? parseInt(document.getElementById('minStock').value) : null;
+            const maxStock = document.getElementById('maxStock').value ? parseInt(document.getElementById('maxStock').value) : null;
+            const brandSelect = document.getElementById('advancedBrand');
+            const selectedBrands = Array.from(brandSelect.selectedOptions).map(opt => opt.value);
+            const supplier = document.getElementById('advancedSupplier').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const status = document.getElementById('productStatus').value;
+            const excludeOutOfStock = document.getElementById('excludeOutOfStock').checked;
+            const onlyLowStock = document.getElementById('onlyLowStock').checked;
+            
+            let results = sampleProducts.filter(product => {
+                let matches = true;
+                
+                // Filtro por precio
+                matches = matches && (product.price >= minPrice && product.price <= maxPrice);
+                
+                // Filtro por stock
+                if (minStock !== null) matches = matches && (product.stock >= minStock);
+                if (maxStock !== null) matches = matches && (product.stock <= maxStock);
+                
+                // Filtro por marca
+                if (selectedBrands.length > 0) {
+                    matches = matches && selectedBrands.includes(product.brand);
+                }
+                
+                // Filtro por proveedor
+                if (supplier) {
+                    matches = matches && (product.supplier === supplier);
+                }
+                
+                // Filtro por fecha
+                if (startDate) {
+                    matches = matches && (product.registered >= startDate);
+                }
+                if (endDate) {
+                    matches = matches && (product.registered <= endDate);
+                }
+                
+                // Filtro por estado
+                if (status) {
+                    matches = matches && (product.status === status);
+                }
+                
+                // Filtro por disponibilidad de stock
+                if (excludeOutOfStock) {
+                    matches = matches && (product.stock > 0);
+                }
+                
+                // Filtro por stock bajo
+                if (onlyLowStock) {
+                    matches = matches && (product.stock < product.minStock);
+                }
+                
+                return matches;
+            });
+            
+            displayResults(results, 'Búsqueda avanzada');
+        }
+        
+        function executeCodeSearch() {
+            const codeInput = document.getElementById('productCodeInput').value;
+            const codeType = document.getElementById('codeType').value;
+            
+            if (!codeInput && codeType !== 'range') {
+                alert('Por favor ingrese un código para buscar');
+                return;
+            }
+            
+            let results = [];
+            
+            switch(codeType) {
+                case 'exact':
+                    const fullCode = `WBS-${codeInput}`;
+                    results = sampleProducts.filter(product => product.code === fullCode);
+                    break;
+                    
+                case 'partial':
+                    results = sampleProducts.filter(product => 
+                        product.code.includes(codeInput) ||
+                        product.code.replace('WBS-', '').includes(codeInput)
+                    );
+                    break;
+                    
+                case 'range':
+                    // Implementar búsqueda por rango de códigos
+                    results = sampleProducts;
+                    break;
+            }
+            
+            displayResults(results, `Búsqueda por código (${codeType})`);
+        }
+        
+        function executeStockSearch() {
+            const stockLevel = document.getElementById('stockLevel').value;
+            const daysInactive = document.getElementById('daysInactive').value ? parseInt(document.getElementById('daysInactive').value) : null;
+            const belowMinStock = document.getElementById('belowMinStock').checked;
+            const needReorder = document.getElementById('needReorder').checked;
+            
+            let results = sampleProducts.filter(product => {
+                let matches = true;
+                
+                // Filtro por nivel de stock
+                if (stockLevel) {
+                    const stockPercentage = (product.stock / product.minStock) * 100;
+                    
+                    switch(stockLevel) {
+                        case 'critical':
+                            matches = matches && (stockPercentage < 10 || product.stock === 0);
+                            break;
+                        case 'low':
+                            matches = matches && (stockPercentage < 25);
+                            break;
+                        case 'medium':
+                            matches = matches && (stockPercentage >= 25 && stockPercentage <= 75);
+                            break;
+                        case 'high':
+                            matches = matches && (stockPercentage > 75);
+                            break;
+                        case 'out':
+                            matches = matches && (product.stock === 0);
+                            break;
+                    }
+                }
+                
+                // Filtro por días sin movimiento
+                if (daysInactive !== null) {
+                    // Implementar lógica de días sin movimiento
+                    // matches = matches && (product.lastMovement...);
+                }
+                
+                // Filtro por debajo del stock mínimo
+                if (belowMinStock) {
+                    matches = matches && (product.stock < product.minStock);
+                }
+                
+                // Filtro por necesidad de reorden
+                if (needReorder) {
+                    matches = matches && (product.stock <= product.minStock * 1.5);
+                }
+                
+                return matches;
+            });
+            
+            displayResults(results, 'Búsqueda por stock');
+        }
+        
+        // Mostrar resultados
+        function displayResults(results, searchType) {
+            currentResults = results;
+            currentPage = 1;
+            
+            const resultsContainer = document.getElementById('searchResults');
+            const countElement = document.getElementById('resultsCount');
+            const paginationContainer = document.getElementById('paginationContainer');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h6 class="mb-2">No se encontraron productos</h6>
+                        <p class="text-muted mb-0">Intente con diferentes criterios de búsqueda</p>
+                    </div>
+                `;
+                countElement.textContent = '0 productos encontrados';
+                paginationContainer.style.display = 'none';
+                return;
+            }
+            
+            countElement.textContent = `${results.length} productos encontrados (${searchType})`;
+            paginationContainer.style.display = 'block';
+            
+            updateResultsDisplay();
+            updatePagination();
+        }
+        
+        function updateResultsDisplay() {
+            const startIndex = (currentPage - 1) * resultsPerPage;
+            const endIndex = startIndex + resultsPerPage;
+            const pageResults = currentResults.slice(startIndex, endIndex);
+            
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
+            
+            pageResults.forEach(product => {
+                // Determinar estado del stock
+                let stockClass, stockText;
+                if (product.stock === 0) {
+                    stockClass = 'stock-low';
+                    stockText = 'AGOTADO';
+                } else if (product.stock < product.minStock) {
+                    stockClass = 'stock-low';
+                    stockText = 'BAJO';
+                } else if (product.stock <= product.minStock * 2) {
+                    stockClass = 'stock-medium';
+                    stockText = 'MEDIO';
+                } else {
+                    stockClass = 'stock-high';
+                    stockText = 'ALTO';
+                }
+                
+                const resultHTML = `
+                    <div class="result-item" onclick="viewProductDetails(${product.id})">
+                        <div class="row align-items-center">
+                            <div class="col-md-1">
+                                <div class="product-image" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                    <i class="fas fa-${getProductIcon(product.category)}"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="result-code">${product.code}</div>
+                                <h6 class="mb-1 mt-1">${product.name}</h6>
+                                <small class="text-muted">${product.brand}</small>
+                            </div>
+                            <div class="col-md-2">
+                                <span class="product-category">${product.category}</span>
+                            </div>
+                            <div class="col-md-2">
+                                <strong class="text-success">$${product.price.toFixed(2)}</strong>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stock-indicator ${stockClass}">
+                                    ${product.stock} unidades
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-boxpro btn-boxpro-primary btn-sm" onclick="event.stopPropagation(); editProduct(${product.id})">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                resultsContainer.innerHTML += resultHTML;
+            });
+        }
+        
+        function updatePagination() {
+            const totalPages = Math.ceil(currentResults.length / resultsPerPage);
+            const paginationContainer = document.getElementById('searchPagination');
+            
+            paginationContainer.innerHTML = '';
+            
+            // Botón anterior
+            paginationContainer.innerHTML += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            `;
+            
+            // Números de página
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationContainer.innerHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    paginationContainer.innerHTML += `
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    `;
+                }
+            }
+            
+            // Botón siguiente
+            paginationContainer.innerHTML += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            `;
+        }
+        
+        function changePage(page) {
+            currentPage = page;
+            updateResultsDisplay();
+            updatePagination();
+        }
+        
+        // Funciones auxiliares
+        function getProductIcon(category) {
+            const iconMap = {
+                'Cintas Transparentes': 'tape',
+                'Envoplast': 'film',
+                'Cinta Aislante': 'bolt',
+                'Cinta de Oficina': 'sticky-note',
+                'Tirro de Papel': 'cut',
+                'Flejes Plásticos': 'bars',
+                'Películas Estirables': 'layer-group',
+                'Material de Protección': 'shield-alt'
+            };
+            return iconMap[category] || 'box';
+        }
+        
+        function viewProductDetails(productId) {
+            alert(`Ver detalles del producto ID: ${productId}\nRedirigiendo a página de detalles...`);
+            // En un sistema real: window.location.href = `detalle.html?id=${productId}`;
+        }
+        
+        function editProduct(productId) {
+            alert(`Editar producto ID: ${productId}\nRedirigiendo a página de edición...`);
+            // En un sistema real: window.location.href = `edicion.html?id=${productId}`;
+        }
+        
+        function exportResults() {
+            if (currentResults.length === 0) {
+                alert('No hay resultados para exportar');
+                return;
+            }
+            
+            alert(`Exportando ${currentResults.length} productos a Excel...\nEn un sistema real, se generaría un archivo .xlsx`);
+        }
+        
+        // Limpiar búsquedas
+        function clearBasicSearch() {
+            document.getElementById('basicSearchInput').value = '';
+            document.getElementById('basicCategory').value = '';
+            updateBasicFilters();
+        }
+        
+        function clearAdvancedSearch() {
+            removePriceFilter();
+            removeStockFilter();
+            removeDateFilter();
+            removeStatusFilter();
+            document.getElementById('advancedBrand').selectedIndex = -1;
+            document.getElementById('advancedSupplier').value = '';
+            document.getElementById('excludeOutOfStock').checked = false;
+            document.getElementById('onlyLowStock').checked = false;
+            updateAdvancedFilters();
+        }
+        
+        function clearCodeSearch() {
+            document.getElementById('productCodeInput').value = '';
+            document.getElementById('codeType').value = 'exact';
+        }
+        
+        function clearStockSearch() {
+            document.getElementById('stockLevel').value = '';
+            document.getElementById('daysInactive').value = '';
+            document.getElementById('belowMinStock').checked = false;
+            document.getElementById('needReorder').checked = false;
+        }
+        
+        // Sugerencias de búsqueda
+        function setupSearchSuggestions() {
+            const searchInput = document.getElementById('basicSearchInput');
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (searchTerm.length < 2) {
+                    suggestionsContainer.style.display = 'none';
+                    return;
+                }
+                
+                // Generar sugerencias basadas en los productos
+                const suggestions = [];
+                
+                sampleProducts.forEach(product => {
+                    if (product.name.toLowerCase().includes(searchTerm) && !suggestions.includes(product.name)) {
+                        suggestions.push(product.name);
+                    }
+                    if (product.brand.toLowerCase().includes(searchTerm) && !suggestions.includes(product.brand)) {
+                        suggestions.push(product.brand);
+                    }
+                    if (product.category.toLowerCase().includes(searchTerm) && !suggestions.includes(product.category)) {
+                        suggestions.push(product.category);
+                    }
+                });
+                
+                // Limitar a 5 sugerencias
+                suggestions.splice(5);
+                
+                if (suggestions.length > 0) {
+                    suggestionsContainer.innerHTML = suggestions.map(suggestion => 
+                        `<div class="suggestion-item" onclick="selectSuggestion('${suggestion}')">${suggestion}</div>`
+                    ).join('');
+                    suggestionsContainer.style.display = 'block';
+                } else {
+                    suggestionsContainer.style.display = 'none';
+                }
+            });
+            
+            // Ocultar sugerencias al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            });
+        }
+        
+        function selectSuggestion(suggestion) {
+            document.getElementById('basicSearchInput').value = suggestion;
+            document.getElementById('searchSuggestions').style.display = 'none';
+            updateBasicFilters();
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarFecha();
+            setupPriceSliders();
+            setupSearchSuggestions();
+            
+            // Configurar event listeners
+            document.getElementById('basicSearchInput').addEventListener('input', updateBasicFilters);
+            document.getElementById('basicCategory').addEventListener('change', updateBasicFilters);
+            
+            document.getElementById('minStock').addEventListener('input', updateAdvancedFilters);
+            document.getElementById('maxStock').addEventListener('input', updateAdvancedFilters);
+            document.getElementById('startDate').addEventListener('change', updateAdvancedFilters);
+            document.getElementById('endDate').addEventListener('change', updateAdvancedFilters);
+            document.getElementById('productStatus').addEventListener('change', updateAdvancedFilters);
+            document.getElementById('excludeOutOfStock').addEventListener('change', updateAdvancedFilters);
+            document.getElementById('onlyLowStock').addEventListener('change', updateAdvancedFilters);
+            
+            // Mostrar resultados de ejemplo al cargar
+            setTimeout(() => {
+                executeBasicSearch();
+                document.querySelector('.fade-in').style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

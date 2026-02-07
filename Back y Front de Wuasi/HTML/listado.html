@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Productos -  WUASI Box</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #1a5f7a, #2a9d8f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .btn-view {
+            background: rgba(69, 123, 157, 0.1);
+            color: #457b9d;
+        }
+        
+        .btn-edit {
+            background: rgba(233, 196, 106, 0.1);
+            color: #e9c46a;
+        }
+        
+        .btn-delete {
+            background: rgba(230, 57, 70, 0.1);
+            color: #e63946;
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .pagination-custom .page-link {
+            color: #1a5f7a;
+            border: 1px solid #dee2e6;
+        }
+        
+        .pagination-custom .page-item.active .page-link {
+            background: linear-gradient(to right, #1a5f7a, #2a9d8f);
+            border-color: #1a5f7a;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            .main-container {
+                box-shadow: none !important;
+                border: none !important;
+            }
+            
+            .table-custom {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado Corporativo -->
+    <header class="corporate-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div>
+                            <h1 class="company-name mb-1">WUASI BOX</h1>
+                            <p class="company-tagline mb-0">Especialistas en productos de embalaje</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="text-white">
+                        <p class="mb-1"><i class="fas fa-calendar-alt me-2"></i>Fecha: <span id="current-date"></span></p>
+                        <p class="mb-0"><i class="fas fa-user me-2"></i>Usuario: <strong>Administrador</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación Principal -->
+    <nav class="navbar navbar-expand-lg navbar-light main-nav">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="index.html">
+                            <i class="fas fa-home me-1"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="registro.html">
+                            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom active" href="listado.html">
+                            <i class="fas fa-list me-1"></i> Listado
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="busqueda.html">
+                            <i class="fas fa-search me-1"></i> Búsqueda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="reportes.html">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="estadisticas.html">
+                            <i class="fas fa-chart-pie me-1"></i> Estadísticas
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="badge bg-warning text-dark me-3">
+                        <i class="fas fa-exclamation-triangle me-1"></i> 3 Alertas
+                    </span>
+                    <button class="btn btn-boxpro btn-boxpro-primary">
+                        <i class="fas fa-sign-out-alt me-1"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container">
+        <div class="main-container fade-in">
+            <!-- Encabezado de la página -->
+            <div class="section-header">
+                <h2><i class="fas fa-list section-icon"></i> Listado Completo de Productos</h2>
+                <p class="text-muted mb-0">Gestione y visualice todos los productos de embalaje registrados en el sistema</p>
+            </div>
+
+            <!-- Tarjeta de Filtros -->
+            <div class="filter-card no-print">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label-custom">Buscar producto:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control form-control-custom" id="searchInput" placeholder="Nombre, código...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">Categoría:</label>
+                        <select class="form-select form-control-custom" id="categoryFilter">
+                            <option value="">Todas las categorías</option>
+                            <option value="Cintas Transparentes">Cintas Transparentes</option>
+                            <option value="Envoplast">Envoplast</option>
+                            <option value="Cinta Aislante">Cinta Aislante</option>
+                            <option value="Cinta de Oficina">Cinta de Oficina</option>
+                            <option value="Tirro de Papel">Tirro de Papel</option>
+                            <option value="Flejes Plásticos">Flejes Plásticos</option>
+                            <option value="Películas Estirables">Películas Estirables</option>
+                            <option value="Material de Protección">Material de Protección</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">Estado de stock:</label>
+                        <select class="form-select form-control-custom" id="stockFilter">
+                            <option value="">Todos los estados</option>
+                            <option value="high">Stock Alto</option>
+                            <option value="medium">Stock Medio</option>
+                            <option value="low">Stock Bajo</option>
+                            <option value="out">Agotado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-custom">Ordenar por:</label>
+                        <select class="form-select form-control-custom" id="sortFilter">
+                            <option value="name">Nombre (A-Z)</option>
+                            <option value="name-desc">Nombre (Z-A)</option>
+                            <option value="code">Código</option>
+                            <option value="stock">Stock (Mayor a menor)</option>
+                            <option value="price">Precio (Mayor a menor)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-8">
+                        <div class="export-buttons">
+                            <button class="btn btn-boxpro btn-boxpro-primary" id="applyFilters">
+                                <i class="fas fa-filter me-2"></i>Aplicar Filtros
+                            </button>
+                            <button class="btn btn-boxpro btn-boxpro-secondary" id="resetFilters">
+                                <i class="fas fa-redo me-2"></i>Limpiar Filtros
+                            </button>
+                            <button class="btn btn-boxpro btn-boxpro-success" id="exportExcel">
+                                <i class="fas fa-file-excel me-2"></i>Exportar Excel
+                            </button>
+                            <button class="btn btn-boxpro btn-boxpro-warning" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>Imprimir Listado
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="d-inline-block">
+                            <span class="text-muted">Mostrando </span>
+                            <strong id="productCount">15</strong>
+                            <span class="text-muted"> de </span>
+                            <strong>78</strong>
+                            <span class="text-muted"> productos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Productos -->
+            <div class="table-responsive">
+                <table class="table table-custom table-hover">
+                    <thead>
+                        <tr>
+                            <th width="50">#</th>
+                            <th width="80">Imagen</th>
+                            <th width="120">Código</th>
+                            <th>Nombre del Producto</th>
+                            <th width="150">Categoría</th>
+                            <th width="100">Precio Venta</th>
+                            <th width="100">Stock</th>
+                            <th width="120">Estado</th>
+                            <th width="150" class="text-center no-print">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTable">
+                        <!-- Los productos se cargarán dinámicamente -->
+                        <!-- Ejemplo de fila:
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <div class="product-image">
+                                    <i class="fas fa-tape"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="product-code">BOX-100-0001</span>
+                            </td>
+                            <td>
+                                <strong>Cinta Transparente 48mm x 50m</strong><br>
+                                <small class="text-muted">Marca: 3M | Proveedor: Distribuidora Central</small>
+                            </td>
+                            <td>
+                                <span class="product-category">Cintas Transparentes</span>
+                            </td>
+                            <td>
+                                <strong class="text-success">$4.99</strong><br>
+                                <small class="text-muted">Compra: $2.50</small>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-2">150</div>
+                                    <div class="stock-indicator stock-high">
+                                        <i class="fas fa-check-circle me-1"></i>Alto
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-circle me-1"></i>Activo
+                                </span>
+                            </td>
+                            <td class="text-center no-print">
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-view" title="Ver Detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="row mt-4 no-print">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <span class="text-muted me-3">Mostrar:</span>
+                        <select class="form-select form-control-custom w-auto" id="itemsPerPage">
+                            <option value="10">10 productos</option>
+                            <option value="25" selected>25 productos</option>
+                            <option value="50">50 productos</option>
+                            <option value="100">100 productos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Paginación de productos">
+                        <ul class="pagination pagination-custom justify-content-end">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Resumen de Stock -->
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <div class="section-header">
+                        <h4><i class="fas fa-chart-bar section-icon"></i> Resumen de Stock por Categoría</h4>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon stats-icon-primary">
+                                    <i class="fas fa-tape"></i>
+                                </div>
+                                <div class="stats-value">125</div>
+                                <div class="stats-label">Cintas Transparentes</div>
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon stats-icon-success">
+                                    <i class="fas fa-film"></i>
+                                </div>
+                                <div class="stats-value">42</div>
+                                <div class="stats-label">Envoplast</div>
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon stats-icon-warning">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div class="stats-value">78</div>
+                                <div class="stats-label">Cinta Aislante</div>
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon stats-icon-danger">
+                                    <i class="fas fa-cut"></i>
+                                </div>
+                                <div class="stats-value">15</div>
+                                <div class="stats-label">Tirro de Papel</div>
+                                <div class="progress mt-3" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" style="width: 25%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas de Stock Bajo -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="alert-boxpro alert-boxpro-warning">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="alert-heading mb-2">
+                                    <i class="fas fa-bell me-2"></i>Alertas de Stock
+                                </h5>
+                                <p class="mb-2">Existen <strong>3 productos</strong> con stock por debajo del mínimo requerido.</p>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-tape me-1"></i>Cinta Aislante 19mm - Stock: 5 (Mín: 20)
+                                    </span>
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-cut me-1"></i>Tirro de Papel 24mm - Stock: 8 (Mín: 15)
+                                    </span>
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-film me-1"></i>Envoplast 500mm - Stock: 2 (Mín: 5)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de Página Corporativo -->
+    <footer class="footer-corporate">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">WUASI BOX</h5>
+                    <p class="text-white-50">
+                        Especialistas en productos de embalaje y soluciones de packaging industrial. 
+                        Calidad y servicio desde 2004.
+                    </p>
+                    <div class="mt-4">
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-white-50"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">Enlaces Rápidos</h5>
+                    <div class="footer-links">
+                        <p><a href="index.html"><i class="fas fa-chevron-right me-2"></i>Inicio</a></p>
+                        <p><a href="registro.html"><i class="fas fa-chevron-right me-2"></i>Nuevo Producto</a></p>
+                        <p><a href="listado.html"><i class="fas fa-chevron-right me-2"></i>Listado Completo</a></p>
+                        <p><a href="reportes.html"><i class="fas fa-chevron-right me-2"></i>Reportes</a></p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">Contacto</h5>
+                    <p class="text-white-50">
+                        <i class="fas fa-map-marker-alt me-2"></i>Av. Principal de Cogollal B34, Zona Industrial
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-phone me-2"></i>(01) 234-5678
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-envelope me-2"></i>chriasdf@gmail.com
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-clock me-2"></i>Lun-Vie: 8:00 AM - 6:00 PM
+                    </p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p class="mb-0">© 2004 Wuasi Box Solutions. Todos los derechos reservados. | Sistema desarrollado con Python, HTML5 y Bootstrap 5</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script src="../js/app.js"></script>
+    
+    <script>
+        // Función para cargar productos de ejemplo
+        function cargarProductosEjemplo() {
+            const productos = [
+                {
+                    id: 1,
+                    codigo: "BOX-100-0001",
+                    nombre: "Cinta Transparente 48mm x 50m",
+                    categoria: "Cintas Transparentes",
+                    marca: "3M",
+                    proveedor: "Distribuidora Central",
+                    precioCompra: 2.50,
+                    precioVenta: 4.99,
+                    stock: 150,
+                    stockMinimo: 20,
+                    estado: "Activo",
+                    icono: "fa-tape"
+                },
+                {
+                    id: 2,
+                    codigo: "BOX-100-0002",
+                    nombre: "Cinta Transparente 24mm x 25m",
+                    categoria: "Cintas Transparentes",
+                    marca: "Scotch",
+                    proveedor: "Embalajes SA",
+                    precioCompra: 1.80,
+                    precioVenta: 3.50,
+                    stock: 89,
+                    stockMinimo: 30,
+                    estado: "Activo",
+                    icono: "fa-tape"
+                },
+                {
+                    id: 3,
+                    codigo: "BOX-200-0001",
+                    nombre: "Envoplast Industrial 20 micras",
+                    categoria: "Envoplast",
+                    marca: "StretchPro",
+                    proveedor: "Plásticos Industriales SA",
+                    precioCompra: 45.00,
+                    precioVenta: 89.99,
+                    stock: 25,
+                    stockMinimo: 5,
+                    estado: "Activo",
+                    icono: "fa-film"
+                },
+                {
+                    id: 4,
+                    codigo: "BOX-200-0002",
+                    nombre: "Envoplast Manual 17 micras",
+                    categoria: "Envoplast",
+                    marca: "WrapMaster",
+                    proveedor: "Envoplast Global",
+                    precioCompra: 32.50,
+                    precioVenta: 65.00,
+                    stock: 42,
+                    stockMinimo: 10,
+                    estado: "Activo",
+                    icono: "fa-film"
+                },
+                {
+                    id: 5,
+                    codigo: "BOX-300-0001",
+                    nombre: "Cinta Aislante 19mm x 20m",
+                    categoria: "Cinta Aislante",
+                    marca: "3M",
+                    proveedor: "Electricidad Total",
+                    precioCompra: 3.20,
+                    precioVenta: 6.50,
+                    stock: 5, // Stock bajo para ejemplo
+                    stockMinimo: 20,
+                    estado: "Activo",
+                    icono: "fa-bolt"
+                },
+                {
+                    id: 6,
+                    codigo: "BOX-300-0002",
+                    nombre: "Cinta Aislante 25mm x 10m",
+                    categoria: "Cinta Aislante",
+                    marca: "Scotch",
+                    proveedor: "Materiales Eléctricos",
+                    precioCompra: 2.80,
+                    precioVenta: 5.75,
+                    stock: 67,
+                    stockMinimo: 25,
+                    estado: "Activo",
+                    icono: "fa-bolt"
+                },
+                {
+                    id: 7,
+                    codigo: "BOX-400-0001",
+                    nombre: "Cinta de Oficina 24mm x 40m",
+                    categoria: "Cinta de Oficina",
+                    marca: "Scotch",
+                    proveedor: "Office Supplies",
+                    precioCompra: 1.50,
+                    precioVenta: 2.99,
+                    stock: 120,
+                    stockMinimo: 40,
+                    estado: "Activo",
+                    icono: "fa-sticky-note"
+                },
+                {
+                    id: 8,
+                    codigo: "BOX-500-0001",
+                    nombre: "Tirro de Papel 24mm x 50m",
+                    categoria: "Tirro de Papel",
+                    marca: "MaskingPro",
+                    proveedor: "Papeles Especiales",
+                    precioCompra: 2.20,
+                    precioVenta: 4.25,
+                    stock: 8, // Stock bajo para ejemplo
+                    stockMinimo: 15,
+                    estado: "Activo",
+                    icono: "fa-cut"
+                },
+                {
+                    id: 9,
+                    codigo: "BOX-600-0001",
+                    nombre: "Fleje Plástico 16mm x 100m",
+                    categoria: "Flejes Plásticos",
+                    marca: "Signode",
+                    proveedor: "Embalajes Industriales",
+                    precioCompra: 28.00,
+                    precioVenta: 55.00,
+                    stock: 34,
+                    stockMinimo: 8,
+                    estado: "Activo",
+                    icono: "fa-bars"
+                },
+                {
+                    id: 10,
+                    codigo: "BOX-700-0001",
+                    nombre: "Película Estirable 500mm",
+                    categoria: "Películas Estirables",
+                    marca: "Mobilis",
+                    proveedor: "Plásticos Avanzados",
+                    precioCompra: 38.50,
+                    precioVenta: 75.00,
+                    stock: 19,
+                    stockMinimo: 6,
+                    estado: "Activo",
+                    icono: "fa-layer-group"
+                }
+            ];
+            
+            const tbody = document.getElementById('productsTable');
+            tbody.innerHTML = '';
+            
+            productos.forEach((producto, index) => {
+                // Determinar estado del stock
+                let stockClass, stockText, stockIcon;
+                if (producto.stock === 0) {
+                    stockClass = 'stock-low';
+                    stockText = 'Agotado';
+                    stockIcon = 'fa-times-circle';
+                } else if (producto.stock <= producto.stockMinimo) {
+                    stockClass = 'stock-low';
+                    stockText = 'Bajo';
+                    stockIcon = 'fa-exclamation-circle';
+                } else if (producto.stock <= producto.stockMinimo * 2) {
+                    stockClass = 'stock-medium';
+                    stockText = 'Medio';
+                    stockIcon = 'fa-info-circle';
+                } else {
+                    stockClass = 'stock-high';
+                    stockText = 'Alto';
+                    stockIcon = 'fa-check-circle';
+                }
+                
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <div class="product-image">
+                                <i class="fas ${producto.icono}"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="product-code">${producto.codigo}</span>
+                        </td>
+                        <td>
+                            <strong>${producto.nombre}</strong><br>
+                            <small class="text-muted">Marca: ${producto.marca} | Proveedor: ${producto.proveedor}</small>
+                        </td>
+                        <td>
+                            <span class="product-category">${producto.categoria}</span>
+                        </td>
+                        <td>
+                            <strong class="text-success">$${producto.precioVenta.toFixed(2)}</strong><br>
+                            <small class="text-muted">Compra: $${producto.precioCompra.toFixed(2)}</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">${producto.stock}</div>
+                                <div class="stock-indicator ${stockClass}">
+                                    <i class="fas ${stockIcon} me-1"></i>${stockText}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-active">
+                                <i class="fas fa-circle me-1"></i>${producto.estado}
+                            </span>
+                        </td>
+                        <td class="text-center no-print">
+                            <div class="action-buttons">
+                                <button class="action-btn btn-view" title="Ver Detalles" onclick="verDetalle(${producto.id})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="action-btn btn-edit" title="Editar" onclick="editarProducto('${producto.codigo}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn btn-delete" title="Eliminar" onclick="eliminarProducto('${producto.codigo}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                tbody.innerHTML += row;
+            });
+            
+            // Actualizar contador
+            document.getElementById('productCount').textContent = productos.length;
+        }
+        
+        // Funciones para acciones
+        function verDetalle(id) {
+            alert(`Ver detalles del producto ID: ${id}\nEsta función cargaría una ventana modal con todos los detalles.`);
+        }
+        
+        function editarProducto(codigo) {
+            alert(`Editar producto: ${codigo}\nEsta función redirigiría al formulario de edición.`);
+            // En un sistema real: window.location.href = `edicion.html?codigo=${codigo}`;
+        }
+        
+        function eliminarProducto(codigo) {
+            if (confirm(`¿Está seguro de eliminar el producto ${codigo}?\nEsta acción no se puede deshacer.`)) {
+                alert(`Producto ${codigo} eliminado (simulación).\nEn un sistema real, se enviaría una petición al backend.`);
+                // Recargar la tabla
+                cargarProductosEjemplo();
+            }
+        }
+        
+        // Filtrado de productos
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const stockFilter = document.getElementById('stockFilter').value;
+            
+            alert(`Aplicando filtros:\n- Búsqueda: ${searchText || "(ninguna)"}\n- Categoría: ${category || "Todas"}\n- Stock: ${stockFilter || "Todos"}\n\nEn un sistema real, se filtrarían los productos.`);
+        });
+        
+        document.getElementById('resetFilters').addEventListener('click', function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('stockFilter').value = '';
+            document.getElementById('sortFilter').value = 'name';
+            alert('Filtros restablecidos');
+        });
+        
+        document.getElementById('exportExcel').addEventListener('click', function() {
+            alert('Exportando a Excel...\nEn un sistema real, se generaría un archivo .xlsx');
+        });
+        
+        // Actualizar fecha actual
+        function actualizarFecha() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('es-ES', options);
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarFecha();
+            cargarProductosEjemplo();
+            
+            // Simular carga
+            setTimeout(() => {
+                document.querySelector('.fade-in').style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

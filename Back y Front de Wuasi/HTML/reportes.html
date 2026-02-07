@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Análisis - Wuasi Box</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .report-header {
+            background: linear-gradient(135deg, #1a5f7a, #2a9d8f);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .report-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+            height: 100%;
+        }
+        
+        .report-card-header {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .kpi-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .kpi-positive {
+            background: linear-gradient(135deg, rgba(42, 157, 143, 0.1), rgba(42, 157, 143, 0.05));
+            border: 1px solid rgba(42, 157, 143, 0.3);
+        }
+        
+        .kpi-warning {
+            background: linear-gradient(135deg, rgba(233, 196, 106, 0.1), rgba(233, 196, 106, 0.05));
+            border: 1px solid rgba(233, 196, 106, 0.3);
+        }
+        
+        .kpi-negative {
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(230, 57, 70, 0.05));
+            border: 1px solid rgba(230, 57, 70, 0.3);
+        }
+        
+        .kpi-neutral {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(108, 117, 125, 0.05));
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+        
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .trend-up {
+            background: rgba(42, 157, 143, 0.1);
+            color: #2a9d8f;
+        }
+        
+        .trend-down {
+            background: rgba(230, 57, 70, 0.1);
+            color: #e63946;
+        }
+        
+        .trend-neutral {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+        }
+        
+        .date-range-picker {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .report-table {
+            font-size: 0.9rem;
+        }
+        
+        .report-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .report-type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .report-type-btn {
+            padding: 10px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background: white;
+            color: #495057;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .report-type-btn.active {
+            background: linear-gradient(to right, #1a5f7a, #2a9d8f);
+            color: white;
+            border-color: #1a5f7a;
+        }
+        
+        .report-type-btn:hover:not(.active) {
+            border-color: #1a5f7a;
+            color: #1a5f7a;
+        }
+        
+        .comparison-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .comparison-good {
+            background: rgba(42, 157, 143, 0.1);
+            color: #2a9d8f;
+        }
+        
+        .comparison-bad {
+            background: rgba(230, 57, 70, 0.1);
+            color: #e63946;
+        }
+        
+        .insight-card {
+            border-left: 4px solid #1a5f7a;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+        
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a5f7a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+            
+            .kpi-value {
+                font-size: 2rem;
+            }
+            
+            .report-type-selector {
+                justify-content: center;
+            }
+            
+            .export-options {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Encabezado Corporativo -->
+    <header class="corporate-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="logo-container">
+                        <div class="logo-icon" style="background: white; color: #e74c3c;">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>
+                            <h1 class="company-name mb-1">WUASI BOX</h1>
+                            <p class="company-tagline mb-0">Reportes y Análisis</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="text-white">
+                        <p class="mb-1"><i class="fas fa-calendar-alt me-2"></i>Período: <span id="report-period">Marzo 2024</span></p>
+                        <p class="mb-0"><i class="fas fa-user me-2"></i>Generado por: <strong>Administrador</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación Principal -->
+    <nav class="navbar navbar-expand-lg navbar-light main-nav">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="index.html">
+                            <i class="fas fa-home me-1"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="registro.html">
+                            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="listado.html">
+                            <i class="fas fa-list me-1"></i> Listado
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="busqueda.html">
+                            <i class="fas fa-search me-1"></i> Búsqueda
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom active" href="reportes.html">
+                            <i class="fas fa-chart-bar me-1"></i> Reportes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="estadisticas.html">
+                            <i class="fas fa-chart-pie me-1"></i> Estadísticas
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-boxpro btn-boxpro-primary me-2" onclick="printReport()">
+                        <i class="fas fa-print me-1"></i> Imprimir
+                    </button>
+                    <button class="btn btn-boxpro btn-boxpro-success" onclick="exportReport()">
+                        <i class="fas fa-file-excel me-1"></i> Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container">
+        <!-- Encabezado de Reportes -->
+        <div class="report-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-2"><i class="fas fa-chart-line me-3"></i>Reportes de Desempeño</h2>
+                    <p class="mb-0">Análisis completo del inventario, ventas y desempeño de productos</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="date-range-picker">
+                        <div class="row g-2">
+                            <div class="col">
+                                <label class="form-label-custom mb-1">Desde</label>
+                                <input type="date" class="form-control form-control-custom" 
+                                       id="startDate" value="2024-03-01">
+                            </div>
+                            <div class="col">
+                                <label class="form-label-custom mb-1">Hasta</label>
+                                <input type="date" class="form-control form-control-custom" 
+                                       id="endDate" value="2024-03-15">
+                            </div>
+                        </div>
+                        <button class="btn btn-boxpro btn-boxpro-primary w-100 mt-3" onclick="updateReport()">
+                            <i class="fas fa-sync-alt me-2"></i> Actualizar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selector de Tipo de Reporte -->
+        <div class="report-type-selector">
+            <button class="report-type-btn active" onclick="showReport('inventory')">
+                <i class="fas fa-boxes me-2"></i>Inventario
+            </button>
+            <button class="report-type-btn" onclick="showReport('sales')">
+                <i class="fas fa-dollar-sign me-2"></i>Ventas
+            </button>
+            <button class="report-type-btn" onclick="showReport('performance')">
+                <i class="fas fa-trophy me-2"></i>Desempeño
+            </button>
+            <button class="report-type-btn" onclick="showReport('forecast')">
+                <i class="fas fa-chart-line me-2"></i>Pronóstico
+            </button>
+            <button class="report-type-btn" onclick="showReport('alerts')">
+                <i class="fas fa-exclamation-triangle me-2"></i>Alertas
+            </button>
+        </div>
+
+        <!-- Reporte de Inventario (Activo por defecto) -->
+        <div class="report-content" id="inventoryReport">
+            <!-- KPIs Principales -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-positive">
+                        <div class="kpi-label">Valor Total del Inventario</div>
+                        <div class="kpi-value">$45,850.75</div>
+                        <div class="kpi-change">
+                            <span class="trend-indicator trend-up">
+                                <i class="fas fa-arrow-up me-1"></i>12.5%
+                            </span>
+                            vs período anterior
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-neutral">
+                        <div class="kpi-label">Productos Activos</div>
+                        <div class="kpi-value">156</div>
+                        <div class="kpi-change">
+                            <span class="trend-indicator trend-up">
+                                <i class="fas fa-plus me-1"></i>8
+                            </span>
+                            nuevos este mes
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-warning">
+                        <div class="kpi-label">Stock Promedio</div>
+                        <div class="kpi-value">65%</div>
+                        <div class="kpi-change">
+                            <span class="trend-indicator trend-down">
+                                <i class="fas fa-arrow-down me-1"></i>5.2%
+                            </span>
+                            vs mes anterior
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-negative">
+                        <div class="kpi-label">Productos Críticos</div>
+                        <div class="kpi-value">12</div>
+                        <div class="kpi-change">
+                            <span class="trend-indicator trend-up">
+                                <i class="fas fa-exclamation-triangle me-1"></i>3
+                            </span>
+                            requieren atención
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos y Análisis -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <h5><i class="fas fa-chart-pie me-2"></i>Distribución del Inventario por Categoría</h5>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="inventoryByCategoryChart"></canvas>
+                        </div>
+                        <div class="insight-card">
+                            <div class="d-flex align-items-center">
+                                <div class="insight-icon">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <div>
+                                    <strong>Análisis:</strong> Las cintas transparentes representan el 42% del valor total del inventario, seguido por envoplast con 28%. Considere diversificar el inventario para reducir riesgos.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <h5><i class="fas fa-chart-bar me-2"></i>Top 5 Productos por Valor</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th class="text-end">Valor</th>
+                                        <th class="text-end">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Envoplast Industrial 500mm</td>
+                                        <td class="text-end">$8,950.00</td>
+                                        <td class="text-end"><span class="comparison-badge comparison-good">19.5%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cinta Transparente 48mm</td>
+                                        <td class="text-end">$7,485.00</td>
+                                        <td class="text-end"><span class="comparison-badge comparison-good">16.3%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fleje Plástico 16mm</td>
+                                        <td class="text-end">$6,120.00</td>
+                                        <td class="text-end"><span class="comparison-badge comparison-good">13.3%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Película Estirable 500mm</td>
+                                        <td class="text-end">$5,700.00</td>
+                                        <td class="text-end"><span class="comparison-badge comparison-good">12.4%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cinta Aislante 25mm</td>
+                                        <td class="text-end">$4,312.50</td>
+                                        <td class="text-end"><span class="comparison-badge comparison-good">9.4%</span></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-light">
+                                        <th>Total Top 5</th>
+                                        <th class="text-end">$32,567.50</th>
+                                        <th class="text-end">71.0%</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Stock por Categoría -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="report-card">
+                        <div class="report-card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-table me-2"></i>Análisis Detallado por Categoría</h5>
+                            <div class="export-options">
+                                <button class="btn btn-boxpro btn-boxpro-primary btn-sm">
+                                    <i class="fas fa-download me-1"></i> CSV
+                                </button>
+                                <button class="btn btn-boxpro btn-boxpro-success btn-sm">
+                                    <i class="fas fa-file-excel me-1"></i> Excel
+                                </button>
+                                <button class="btn btn-boxpro btn-boxpro-secondary btn-sm">
+                                    <i class="fas fa-file-pdf me-1"></i> PDF
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th class="text-center">Productos</th>
+                                        <th class="text-center">Stock Total</th>
+                                        <th class="text-center">Valor Total</th>
+                                        <th class="text-center">% del Inventario</th>
+                                        <th class="text-center">Stock Promedio</th>
+                                        <th class="text-center">Rotación</th>
+                                        <th class="text-center">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Cintas Transparentes</strong></td>
+                                        <td class="text-center">45</td>
+                                        <td class="text-center">3,245</td>
+                                        <td class="text-center">$19,257.50</td>
+                                        <td class="text-center">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-primary" style="width: 42%"></div>
+                                            </div>
+                                            42.0%
+                                        </td>
+                                        <td class="text-center">72 unidades</td>
+                                        <td class="text-center">2.8</td>
+                                        <td class="text-center"><span class="badge bg-success">Óptimo</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Envoplast</strong></td>
+                                        <td class="text-center">18</td>
+                                        <td class="text-center">856</td>
+                                        <td class="text-center">$12,838.00</td>
+                                        <td class="text-center">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-success" style="width: 28%"></div>
+                                            </div>
+                                            28.0%
+                                        </td>
+                                        <td class="text-center">48 unidades</td>
+                                        <td class="text-center">1.5</td>
+                                        <td class="text-center"><span class="badge bg-warning">Baja Rotación</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cinta Aislante</strong></td>
+                                        <td class="text-center">32</td>
+                                        <td class="text-center">1,890</td>
+                                        <td class="text-center">$6,615.00</td>
+                                        <td class="text-center">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-info" style="width: 14.4%"></div>
+                                            </div>
+                                            14.4%
+                                        </td>
+                                        <td class="text-center">59 unidades</td>
+                                        <td class="text-center">3.2</td>
+                                        <td class="text-center"><span class="badge bg-success">Alta Rotación</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Flejes Plásticos</strong></td>
+                                        <td class="text-center">12</td>
+                                        <td class="text-center">408</td>
+                                        <td class="text-center">$3,672.00</td>
+                                        <td class="text-center">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-warning" style="width: 8%"></div>
+                                            </div>
+                                            8.0%
+                                        </td>
+                                        <td class="text-center">34 unidades</td>
+                                        <td class="text-center">2.1</td>
+                                        <td class="text-center"><span class="badge bg-info">Normal</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Películas Estirables</strong></td>
+                                        <td class="text-center">15</td>
+                                        <td class="text-center">285</td>
+                                        <td class="text-center">$2,850.00</td>
+                                        <td class="text-center">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-danger" style="width: 6.2%"></div>
+                                            </div>
+                                            6.2%
+                                        </td>
+                                        <td class="text-center">19 unidades</td>
+                                        <td class="text-center">1.8</td>
+                                        <td class="text-center"><span class="badge bg-warning">Baja Rotación</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Otros</strong></td>
+                                        <td class="text-center">34</td>
+                                        <td class="text-center">1,020</td>
+                                        <td class="text-center">$618.25</td>
+                                        <td class="text-center">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar bg-secondary" style="width: 1.4%"></div>
+                                            </div>
+                                            1.4%
+                                        </td>
+                                        <td class="text-center">30 unidades</td>
+                                        <td class="text-center">2.5</td>
+                                        <td class="text-center"><span class="badge bg-info">Normal</span></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th>TOTAL</th>
+                                        <th class="text-center">156</th>
+                                        <th class="text-center">7,704</th>
+                                        <th class="text-center">$45,850.75</th>
+                                        <th class="text-center">100%</th>
+                                        <th class="text-center">49 unidades</th>
+                                        <th class="text-center">2.3</th>
+                                        <th class="text-center">-</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas y Recomendaciones -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <h5><i class="fas fa-exclamation-triangle me-2"></i>Alertas de Stock Crítico</h5>
+                        </div>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-fire me-2"></i>
+                            <strong>12 productos requieren atención inmediata</strong>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th class="text-center">Stock Actual</th>
+                                        <th class="text-center">Stock Mínimo</th>
+                                        <th class="text-center">Déficit</th>
+                                        <th class="text-center">Urgencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Cinta Aislante 19mm x 20m</td>
+                                        <td class="text-center">5</td>
+                                        <td class="text-center">20</td>
+                                        <td class="text-center"><span class="badge bg-danger">-15</span></td>
+                                        <td class="text-center"><span class="badge bg-danger">ALTA</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tirro de Papel 24mm x 50m</td>
+                                        <td class="text-center">8</td>
+                                        <td class="text-center">15</td>
+                                        <td class="text-center"><span class="badge bg-warning">-7</span></td>
+                                        <td class="text-center"><span class="badge bg-warning">MEDIA</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Envoplast 500mm x 1500m</td>
+                                        <td class="text-center">2</td>
+                                        <td class="text-center">5</td>
+                                        <td class="text-center"><span class="badge bg-danger">-3</span></td>
+                                        <td class="text-center"><span class="badge bg-danger">ALTA</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cinta Transparente 12mm x 25m</td>
+                                        <td class="text-center">12</td>
+                                        <td class="text-center">25</td>
+                                        <td class="text-center"><span class="badge bg-warning">-13</span></td>
+                                        <td class="text-center"><span class="badge bg-warning">MEDIA</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-3">
+                            <button class="btn btn-boxpro btn-boxpro-danger">
+                                <i class="fas fa-clipboard-list me-2"></i> Generar Orden de Compra
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="report-card">
+                        <div class="report-card-header">
+                            <h5><i class="fas fa-lightbulb me-2"></i>Recomendaciones</h5>
+                        </div>
+                        <div class="insight-card">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="insight-icon" style="background: #2a9d8f;">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div>
+                                    <strong>Optimización de Inventario:</strong> Reducir inventario de Envoplast en un 15% podría liberar $1,925.70 sin afectar ventas.
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="insight-icon" style="background: #e9c46a;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </div>
+                                <div>
+                                    <strong>Mejora de Rotación:</strong> Los productos de "Películas Estirables" tienen baja rotación. Considere promociones o ajuste de precios.
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start">
+                                <div class="insight-icon" style="background: #e63946;">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div>
+                                    <strong>Atención Urgente:</strong> 4 productos están críticamente bajos de stock. Genere órdenes de compra inmediatamente.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6><i class="fas fa-balance-scale me-2"></i>Comparación Período Anterior</h6>
+                            <div class="comparison-row">
+                                <span>Valor del Inventario:</span>
+                                <span><strong>$45,850.75</strong> <span class="comparison-badge comparison-good">+12.5%</span></span>
+                            </div>
+                            <div class="comparison-row">
+                                <span>Productos Activos:</span>
+                                <span><strong>156</strong> <span class="comparison-badge comparison-good">+5.4%</span></span>
+                            </div>
+                            <div class="comparison-row">
+                                <span>Rotación Promedio:</span>
+                                <span><strong>2.3</strong> <span class="comparison-badge comparison-bad">-0.2</span></span>
+                            </div>
+                            <div class="comparison-row">
+                                <span>Productos Críticos:</span>
+                                <span><strong>12</strong> <span class="comparison-badge comparison-bad">+3</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Otros reportes (ocultos inicialmente) -->
+        <div class="report-content" id="salesReport" style="display: none;">
+            <!-- Contenido de reporte de ventas -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Reporte de ventas en desarrollo. Esta sección mostrará análisis de ventas, tendencias y pronósticos.
+            </div>
+        </div>
+
+        <div class="report-content" id="performanceReport" style="display: none;">
+            <!-- Contenido de reporte de desempeño -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Reporte de desempeño en desarrollo. Esta sección mostrará métricas de rendimiento y eficiencia.
+            </div>
+        </div>
+
+        <div class="report-content" id="forecastReport" style="display: none;">
+            <!-- Contenido de reporte de pronóstico -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Reporte de pronóstico en desarrollo. Esta sección mostrará proyecciones de inventario y demanda.
+            </div>
+        </div>
+
+        <div class="report-content" id="alertsReport" style="display: none;">
+            <!-- Contenido de reporte de alertas -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Reporte de alertas en desarrollo. Esta sección mostrará todas las alertas y notificaciones del sistema.
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de Página Corporativo -->
+    <footer class="footer-corporate">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">WUASI BOX</h5>
+                    <p class="text-white-50">
+                        Reportes profesionales para toma de decisiones informadas.
+                        Datos actualizados al minuto.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">Indicadores Clave</h5>
+                    <div class="footer-links">
+                        <p><i class="fas fa-chevron-right me-2"></i>Valor del Inventario: $45,850.75</p>
+                        <p><i class="fas fa-chevron-right me-2"></i>Productos Activos: 156</p>
+                        <p><i class="fas fa-chevron-right me-2"></i>Rotación Promedio: 2.3</p>
+                        <p><i class="fas fa-chevron-right me-2"></i>Alertas Activas: 12</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white mb-4">Metodología</h5>
+                    <p class="text-white-50">
+                        <i class="fas fa-calculator me-2"></i>Cálculos basados en método FIFO
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-clock me-2"></i>Actualización automática cada 4 horas
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-shield-alt me-2"></i>Datos auditados y verificados
+                    </p>
+                    <p class="text-white-50">
+                        <i class="fas fa-history me-2"></i>Historial disponible por 24 meses
+                    </p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p class="mb-0">© 2024 Wuasi Box. Reporte generado el <span id="report-date"></span>. Los datos son confidenciales.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script>
+        // Variables globales para gráficos
+        let inventoryChart = null;
+        
+        // Actualizar fecha del reporte
+        function updateReportDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('report-date').textContent = 
+                now.toLocaleDateString('es-ES', options);
+            
+            // Actualizar período del reporte
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const startStr = start.toLocaleDateString('es-ES', { month: 'long', day: 'numeric' });
+                const endStr = end.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric' });
+                document.getElementById('report-period').textContent = `${startStr} - ${endStr}`;
+            }
+        }
+        
+        // Mostrar diferentes reportes
+        function showReport(reportType) {
+            // Ocultar todos los reportes
+            document.querySelectorAll('.report-content').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Remover clase activa de todos los botones
+            document.querySelectorAll('.report-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar reporte seleccionado
+            document.getElementById(`${reportType}Report`).style.display = 'block';
+            
+            // Activar botón correspondiente
+            document.querySelectorAll('.report-type-btn').forEach(btn => {
+                if (btn.textContent.includes(getReportName(reportType))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Si es inventario, actualizar gráfico
+            if (reportType === 'inventory' && !inventoryChart) {
+                initializeInventoryChart();
+            }
+        }
+        
+        function getReportName(type) {
+            const names = {
+                'inventory': 'Inventario',
+                'sales': 'Ventas',
+                'performance': 'Desempeño',
+                'forecast': 'Pronóstico',
+                'alerts': 'Alertas'
+            };
+            return names[type] || type;
+        }
+        
+        // Inicializar gráfico de inventario por categoría
+        function initializeInventoryChart() {
+            const ctx = document.getElementById('inventoryByCategoryChart').getContext('2d');
+            
+            inventoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cintas Transparentes', 'Envoplast', 'Cinta Aislante', 'Flejes Plásticos', 'Películas Estirables', 'Otros'],
+                    datasets: [{
+                        data: [19257.50, 12838.00, 6615.00, 3672.00, 2850.00, 618.25],
+                        backgroundColor: [
+                            '#1a5f7a',  // Azul principal
+                            '#2a9d8f',  // Verde turquesa
+                            '#457b9d',  // Azul información
+                            '#e9c46a',  // Amarillo alerta
+                            '#e63946',  // Rojo peligro
+                            '#6c757d'   // Gris
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+        
+        // Actualizar reporte con nuevas fechas
+        function updateReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Por favor seleccione ambas fechas');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('La fecha de inicio no puede ser mayor a la fecha de fin');
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const updateBtn = document.querySelector('.btn-boxpro-primary');
+            const originalText = updateBtn.innerHTML;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Actualizando...';
+            updateBtn.disabled = true;
+            
+            // Simular actualización de datos
+            setTimeout(() => {
+                updateReportDate();
+                
+                // Aquí iría la lógica para actualizar los datos del reporte
+                // con las nuevas fechas seleccionadas
+                
+                // Restaurar botón
+                updateBtn.innerHTML = originalText;
+                updateBtn.disabled = false;
+                
+                // Mostrar mensaje de éxito
+                showNotification('Reporte actualizado exitosamente', 'success');
+                
+            }, 1500);
+        }
+        
+        // Exportar reporte
+        function exportReport() {
+            const exportOptions = `
+                <div class="mt-3">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="exportFormat" id="excelFormat" value="excel" checked>
+                        <label class="form-check-label" for="excelFormat">
+                            <i class="fas fa-file-excel me-2 text-success"></i>Excel (.xlsx)
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="exportFormat" id="pdfFormat" value="pdf">
+                        <label class="form-check-label" for="pdfFormat">
+                            <i class="fas fa-file-pdf me-2 text-danger"></i>PDF (.pdf)
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="exportFormat" id="csvFormat" value="csv">
+                        <label class="form-check-label" for="csvFormat">
+                            <i class="fas fa-file-csv me-2 text-primary"></i>CSV (.csv)
+                        </label>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label-custom">Incluir en el reporte:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeCharts" checked>
+                            <label class="form-check-label" for="includeCharts">Gráficos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeTables" checked>
+                            <label class="form-check-label" for="includeTables">Tablas detalladas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeRecommendations" checked>
+                            <label class="form-check-label" for="includeRecommendations">Recomendaciones</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (confirm('¿Desea exportar el reporte actual?\nSeleccione "Aceptar" para elegir formato.')) {
+                // En un sistema real, aquí se abriría un modal con opciones
+                // Por ahora simulamos la exportación
+                simulateExport();
+            }
+        }
+        
+        function simulateExport() {
+            const exportBtn = document.querySelector('.btn-boxpro-success');
+            const originalText = exportBtn.innerHTML;
+            
+            exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Exportando...';
+            exportBtn.disabled = true;
+            
+            setTimeout(() => {
+                // Simular tiempo de exportación
+                showNotification('Reporte exportado exitosamente', 'success');
+                
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+            }, 2000);
+        }
+        
+        // Imprimir reporte
+        function printReport() {
+            // Guardar el estado actual de los botones
+            const reportTypeBtns = document.querySelector('.report-type-selector');
+            const navBar = document.querySelector('.main-nav');
+            const footer = document.querySelector('.footer-corporate');
+            
+            // Ocultar elementos no necesarios para impresión
+            reportTypeBtns.style.display = 'none';
+            navBar.style.display = 'none';
+            footer.style.display = 'none';
+            
+            // Agregar encabezado de impresión
+            const printHeader = document.createElement('div');
+            printHeader.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px;">
+                    <h2 style="color: #1a5f7a; margin: 0;">WUASI BOX - Reporte de Inventario</h2>
+                    <p style="margin: 5px 0;">Período: ${document.getElementById('report-period').textContent}</p>
+                    <p style="margin: 5px 0;">Generado: ${new Date().toLocaleDateString('es-ES')}</p>
+                </div>
+            `;
+            document.querySelector('.main-container').insertBefore(printHeader, document.querySelector('.main-container').firstChild);
+            
+            // Imprimir
+            window.print();
+            
+            // Restaurar elementos ocultos
+            setTimeout(() => {
+                reportTypeBtns.style.display = 'flex';
+                navBar.style.display = 'block';
+                footer.style.display = 'block';
+                printHeader.remove();
+            }, 100);
+        }
+        
+        // Mostrar notificación
+        function showNotification(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-info';
+            
+            const notification = document.createElement('div');
+            notification.className = `alert ${alertClass} alert-dismissible fade show`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.minWidth = '300px';
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 3 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateReportDate();
+            initializeInventoryChart();
+            
+            // Configurar event listeners para fechas
+            document.getElementById('startDate').addEventListener('change', updateReportDate);
+            document.getElementById('endDate').addEventListener('change', updateReportDate);
+            
+            // Simular carga
+            setTimeout(() => {
+                document.querySelector('.fade-in').style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

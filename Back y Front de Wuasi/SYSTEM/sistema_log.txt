@@ -1,0 +1,5 @@
+2026-02-07 10:57:44 | Sistema | Datos guardados exitosamente
+2026-02-07 11:00:06 | Sistema | Datos cargados exitosamente
+2026-02-07 11:40:49 | Sistema | Datos cargados exitosamente
+2026-02-07 11:41:01 | Sistema | Datos cargados exitosamente
+2026-02-07 11:41:17 | Sistema | Reporte exportado: reporte_inventario_20260207_114117.csv
